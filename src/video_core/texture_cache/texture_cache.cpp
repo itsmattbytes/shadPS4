@@ -209,7 +209,8 @@ ImageId TextureCache::ResolveDepthOverlap(const ImageInfo& requested_info, Bindi
     const bool bpp_match = requested_info.num_bits == cache_image.info.num_bits;
 
     // If an image in the cache has less slices we need to expand it
-    bool recreate = cache_image.info.resources < requested_info.resources;
+    bool recreate = cache_image.info.resources.levels < requested_info.resources.levels ||
+                    cache_image.info.resources.layers < requested_info.resources.layers;
 
     switch (binding) {
     case BindingType::Texture:
@@ -335,7 +336,8 @@ std::tuple<ImageId, int, int> TextureCache::ResolveOverlap(const ImageInfo& imag
 
         // Size and resources are greater, expand the image.
         if (image_info.type == cache_image.info.type &&
-            image_info.resources > cache_image.info.resources) {
+            (image_info.resources.levels > cache_image.info.resources.levels ||
+             image_info.resources.layers > cache_image.info.resources.layers)) {
             return {ExpandImage(image_info, cache_image_id), -1, -1};
         }
 
@@ -435,7 +437,8 @@ std::tuple<ImageId, int, int> TextureCache::ResolveOverlap(const ImageInfo& imag
                   (image_info.num_bits == cache_image.info.num_bits),
                   (image_info.BlockDim() == cache_image.info.BlockDim()),
                   (image_info.pitch == cache_image.info.pitch),
-                  (cache_image.info.resources <= image_info.resources),
+                  (cache_image.info.resources.levels <= image_info.resources.levels &&
+                   cache_image.info.resources.layers <= image_info.resources.layers),
                   cache_image.info.resources.levels, image_info.resources.levels,
                   (cache_image.info.guest_size <= image_info.guest_size), expected_size,
 

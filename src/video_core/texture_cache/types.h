@@ -63,7 +63,7 @@ struct SubresourceExtent {
     u32 levels = 1;
     u32 layers = 1;
 
-    auto operator<=>(const SubresourceExtent&) const = default;
+    bool operator==(const SubresourceExtent&) const = default;
 };
 
 struct SubresourceRange {
